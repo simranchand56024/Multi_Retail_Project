@@ -2,14 +2,25 @@ import streamlit as st
 import pandas as pd
 import pymysql
 import plotly.express as px
+from config import db_credentials  # Importing the credentials
+
+st.set_page_config(page_title="Retail Data Analytics Dashboard", layout="wide")
 
 # Database connection function
-def get_connection():
+'''def get_connection():
     return pymysql.connect(
         host="127.0.0.1",
         user="root",
         password="@Amor1908",
         database="ecommerce",
+        cursorclass=pymysql.cursors.DictCursor
+    )'''
+def get_connection():
+    return pymysql.connect(
+        host=db_credentials['host'],
+        user=db_credentials['user'],
+        password=db_credentials['password'],
+        database=db_credentials['database'],
         cursorclass=pymysql.cursors.DictCursor
     )
 
@@ -27,7 +38,7 @@ def fetch_data(query):
     return df
 
 # Streamlit App Layout
-st.set_page_config(page_title="Retail Data Analytics Dashboard", layout="wide")
+#st.set_page_config(page_title="Retail Data Analytics Dashboard", layout="wide")
 st.sidebar.title("Retail Data Analytics Dashboard")
 
 # Sidebar Navigation
@@ -63,26 +74,26 @@ elif option == "Aggregation Analysis":
         df = fetch_data("SELECT * FROM daily_sales_summary order by date")
         st.dataframe(df)
         df1 = fetch_data("SELECT * FROM daily_sales_summary where date between '2023-01-01' and '2023-01-31' order by date")
-        fig = px.line(df1, x='date', y='total_revenue', title='Daily Sales Trend of Jan-2023')
+        fig = px.bar(df1, x='date', y='total_revenue', title='Daily Sales Trend of Jan-2023')
         st.plotly_chart(fig, use_container_width=True)
 
     elif option == "Monthly sales summary":
          df = fetch_data("SELECT * FROM monthly_sales_summary where year=2021 order by month desc")
          st.dataframe(df)
-         fig = px.line(df, x='month', y='total_revenue', title='Monthly Sales Trend of 2021')
+         fig = px.bar(df, x='month', y='total_revenue', title='Monthly Sales Trend of 2021')
          st.plotly_chart(fig, use_container_width=True)
 
     elif option == "Revenue by Category":
         df = fetch_data("SELECT * FROM revenue_by_category order by total_revenue desc limit 20")
         st.dataframe(df)
-        fig = px.line(df, x='product_category_name', y='total_revenue', title='Revenue By Category')
+        fig = px.bar(df, x='product_category_name', y='total_revenue', title='Revenue By Category')
         st.plotly_chart(fig, use_container_width=True)
         
 
     elif option == "Total Sales by Customer":
         df = fetch_data("SELECT * FROM total_sales_by_customer")
         st.dataframe(df)
-        fig = px.line(df, x='customer_id', y='total_orders', title='Total Sales by Customer')
+        fig = px.bar(df, x='customer_id', y='total_orders', title='Total Sales by Customer')
         st.plotly_chart(fig, use_container_width=True)
 
 
